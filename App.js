@@ -1,11 +1,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { StackNavigator, TabNavigator } from 'react-navigation';
-import AuthScreen from './screens/AuthScreen';
-import WelcomeScreen from './screens/WelcomeScreen';
-import ListScreen from './screens/ListScreen';
-import DeckScreen from './screens/DeckScreen';
-import SettingScreen from './screens/SettingScreen';
+import ListScreen from './src/ListScreen';
+import DeckScreen from './src/DeckScreen';
+import SettingScreen from './src/SettingScreen';
 
 const styles = StyleSheet.create({
   container: {
@@ -15,18 +13,12 @@ const styles = StyleSheet.create({
 
 export default class App extends React.Component {
   render() {
-    const MainNavigator = TabNavigator({
-      welcome: { screen: WelcomeScreen },
-      auth: { screen: AuthScreen },
-      main: {
-        screen: TabNavigator({
-          screen: StackNavigator({
-            list: { screen: ListScreen },
-            deck: { screen: DeckScreen },
-          }),
-          setting: { screen: SettingScreen },
-        }),
-      },
+    const MainNavigator = StackNavigator({
+      main: TabNavigator({
+        list: { screen: ListScreen },
+        deck: { screen: DeckScreen },
+        setting: { screen: SettingScreen },
+      }),
     });
 
     return (

@@ -1,7 +1,14 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, Platform } from 'react-native';
 
 class SettingScreen extends React.Component {
+  static navigationOptions = {
+    title: 'Setting',
+    style: {
+      marginTop: Platform.OS === 'android' ? 24 : 0,
+    },
+  }
+
   render() {
     return (
       <View>
