@@ -1,25 +1,40 @@
 import React from 'react';
-import { Text, View, Platform } from 'react-native';
+import { FlatList } from 'react-native';
+import { connect } from 'react-redux';
+import { ListItem } from 'react-native-elements';
 
 class DeckScreen extends React.Component {
   static navigationOptions = {
-    headerTitle: 'test',
-    title: 'Deck',
-    style: {
-      marginTop: Platform.OS === 'android' ? 24 : 0,
-    },
+    title: 'Deck List',
+    headerTitle: '',
+  }
+
+  renderCards = () => {
+    return (
+      <FlatList
+        data={this.props.cards}
+        keyExtractor={item => item.key}
+        renderItem={({ item }) => (
+          <ListItem
+            title={item.value.front}
+            subtitle={item.value.back}
+          />
+        )}
+      />
+    );
   }
 
   render() {
     return (
-      <View>
-        <Text> DeckScreen </Text>
-        <Text> DeckScreen </Text>
-        <Text> DeckScreen </Text>
-        <Text> DeckScreen </Text>
-      </View>
+      this.renderCards()
     );
   }
 }
 
-export default DeckScreen;
+const mapStateToProps = (state) => {
+  const { cards } = state.deck;
+
+  return { cards };
+};
+
+export default connect(mapStateToProps, null)(DeckScreen);

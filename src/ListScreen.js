@@ -1,24 +1,28 @@
 import React from 'react';
-import { FlatList, Platform } from 'react-native';
-import { Button, ListItem } from 'react-native-elements';
+import { FlatList } from 'react-native';
+import { connect } from 'react-redux';
+import { ListItem } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import data from '../assets/data';
+import { updateDeck } from './actions/DeckAction';
 
 class ListScreen extends React.Component {
-  static navigationOptions = ({ navigation }) => {
-    return ({
-      title: 'Deck List',
-      headerRight: (
-        <Button
-          title="Deck"
-          color="rgba(0, 122, 255, 1)"
-          backgroundColor="transparent"
-          onPress={() => navigation.navigate('deck')}
+  static navigationOptions = {
+    title: 'Deck List',
+    tabBarIcon: ({ focused, tintColor }) => {
+      return (
+        <Icon
+          name="cards-outline"
+          color={focused ? tintColor : 'grey'}
+          size={28}
         />
-      ),
-      style: {
-        marginTop: Platform.OS === 'android' ? 24 : 0,
-      },
-    });
+      );
+    },
+  }
+
+  callDeck = (item) => {
+    this.props.updateDeck(item.cards);
+    this.props.navigation.navigate('deck', { header: item.name });
   }
 
   renderList = () => {
@@ -29,7 +33,8 @@ class ListScreen extends React.Component {
         renderItem={({ item }) => (
           <ListItem
             title={item.name}
-            subtitle={item.data.length}
+            subtitle={`${item.cards.length} cards`}
+            onPress={() => this.callDeck(item)}
           />
         )}
       />
@@ -43,4 +48,10 @@ class ListScreen extends React.Component {
   }
 }
 
-export default ListScreen;
+const mapStateToProps = (state) => {
+  const { shuffled, numOfCards } = state.deck;
+
+  return { shuffled, numOfCards };
+};
+
+export default connect(null, { updateDeck })(ListScreen);

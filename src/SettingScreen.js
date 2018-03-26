@@ -1,21 +1,26 @@
 import React from 'react';
-import { Text, View, Platform } from 'react-native';
+import { Text, View } from 'react-native';
+import { ListItem } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/SimpleLineIcons';
 
 class SettingScreen extends React.Component {
   static navigationOptions = {
     title: 'Setting',
-    style: {
-      marginTop: Platform.OS === 'android' ? 24 : 0,
+    tabBarIcon: ({ focused, tintColor }) => {
+      return (
+        <Icon
+          name="settings"
+          color={focused ? tintColor : 'grey'}
+          size={25}
+        />
+      );
     },
   }
 
   render() {
     return (
       <View>
-        <Text> SettingScreen </Text>
-        <Text> SettingScreen </Text>
-        <Text> SettingScreen </Text>
-        <Text> SettingScreen </Text>
+        <ListItem title="Number of Cards" />
       </View>
     );
   }
