@@ -1,21 +1,12 @@
 import React from 'react';
-import { FlatList, StyleSheet, TouchableHighlight } from 'react-native';
+import { FlatList } from 'react-native';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Button, ListItem } from 'react-native-elements';
 import Swipeable from 'react-native-swipeable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { updateCards, readList, deleteDeck } from './actions';
-import { Spinner } from './components/common';
-
-const styles = StyleSheet.create({
-  deleteButton: {
-    flex: 1,
-    backgroundColor: 'grey',
-    justifyContent: 'center',
-    paddingLeft: 10,
-  },
-});
+import { Spinner, SwipeButton } from './components/common';
 
 class ListScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -47,21 +38,25 @@ class ListScreen extends React.Component {
 
   callDeck = (item) => {
     this.props.updateCards(item.deck_id);
-    this.props.navigation.navigate('deck', { header: item.name });
+    this.props.navigation.navigate('deck', { header: item.name, deckID: item.deck_id });
+  }
+
+  editName = (deckID) => {
+    console.log(deckID);
   }
 
   rightButtons = (deckID) => {
     return ([
-      <TouchableHighlight
-        style={styles.deleteButton}
+      <SwipeButton
+        name="pencil"
+        backgroundColor="grey"
+        onPress={() => this.editName(deckID)}
+      />,
+      <SwipeButton
+        name="delete"
+        backgroundColor="red"
         onPress={() => this.props.deleteDeck(deckID)}
-      >
-        <Icon
-          name="delete"
-          color="white"
-          size={35}
-        />
-      </TouchableHighlight>,
+      />,
     ]);
   }
 

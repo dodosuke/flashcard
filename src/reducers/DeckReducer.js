@@ -14,8 +14,8 @@ export default (state = INITIAL_STATE, action) => {
       return { ...state, cards: action.payload };
     case FETCH_START:
       return { ...state, loading: true };
-    case FETCH_FAIL:
-      return { ...state, loading: false, err: action.payload };
+    case FETCH_SUCCESS:
+      return { ...state, loading: false };
     case UPDATE_LISTS:
       return { ...state, loading: false, list: action.payload };
     default:
