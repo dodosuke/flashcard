@@ -1,1 +1,1 @@
-export * from './DeckAction';
+export * from './DeckActions';

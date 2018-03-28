@@ -4,20 +4,23 @@ import { connect } from 'react-redux';
 import { ListItem } from 'react-native-elements';
 
 class DeckScreen extends React.Component {
-  static navigationOptions = {
-    title: 'Deck List',
-    headerTitle: '',
+  static navigationOptions = ({ navigation }) => {
+    const { params } = navigation.state;
+    return {
+      title: 'List',
+      headerTitle: params ? params.header : '',
+    };
   }
 
   renderCards = () => {
     return (
       <FlatList
         data={this.props.cards}
-        keyExtractor={item => item.key}
+        keyExtractor={item => item.card_id}
         renderItem={({ item }) => (
           <ListItem
-            title={item.value.front}
-            subtitle={item.value.back}
+            title={item.front}
+            subtitle={item.back}
           />
         )}
       />

@@ -2,8 +2,8 @@ import React from 'react';
 import { StyleSheet, View, Platform } from 'react-native';
 import { StackNavigator, TabNavigator } from 'react-navigation';
 import { Provider } from 'react-redux';
-import { createStore, applyMiddleware } from 'redux';
-import ReduxThunk from 'redux-thunk';
+import { createStore, compose, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
 import reducers from './src/reducers';
 import ListScreen from './src/ListScreen';
 import DeckScreen from './src/DeckScreen';
@@ -25,6 +25,9 @@ const tabNavConfig = {
   },
 };
 
+
+const store = createStore(reducers, {}, compose(applyMiddleware(thunk)));
+
 export default class App extends React.Component {
   render() {
     const MainNavigator = TabNavigator({
@@ -36,8 +39,6 @@ export default class App extends React.Component {
         setting: { screen: SettingScreen },
       }),
     }, tabNavConfig);
-
-    const store = createStore(reducers, {}, applyMiddleware(ReduxThunk));
 
     return (
       <Provider store={store}>

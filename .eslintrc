@@ -4,7 +4,8 @@
   "rules": {
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
     "arrow-body-style": 0,
-    "react/prefer-stateless-function": [1, { "ignorePureComponents": "true" }]
+    "react/prefer-stateless-function": [1, { "ignorePureComponents": "true" }],
+    "no-bitwise": 0,
   },
   "env": {
     "browser": true
