@@ -14,6 +14,13 @@ class DeckScreen extends React.Component {
     return {
       title: 'List',
       headerTitle: params ? params.header : '',
+      headerRight: (
+        <Button
+          title="Edit"
+          color="rgba(0, 122, 255, 1)"
+          backgroundColor="transparent"
+        />
+      ),
       tabBarIcon: ({ focused, tintColor }) => {
         return (
           <Icon
@@ -33,7 +40,6 @@ class DeckScreen extends React.Component {
   }
 
   onSwipe = (direction, item) => {
-    console.log(item);
     const memorized = (direction === 'right');
     this.props.updateScore(item, memorized);
     this.setState({ back: 0 });

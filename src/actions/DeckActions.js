@@ -1,6 +1,6 @@
 import { SQLite } from 'expo';
 import _ from 'lodash';
-import { UPDATE_CARDS, UPDATE_LISTS, FETCH_START, FETCH_SUCCESS } from './types';
+import { UPDATE_CARDS, UPDATE_LISTS, FETCH_START, FETCH_SUCCESS, FETCH_FAIL } from './types';
 
 const db = SQLite.openDatabase('flashcard.db');
 
@@ -13,11 +13,15 @@ const uuidv4 = () => {
 };
 
 const fetchStart = (dispatch) => { dispatch({ type: FETCH_START }); };
+
 const fetchSuccess = (dispatch) => { dispatch({ type: FETCH_SUCCESS }); };
+
+const fetchFail = (dispatch, err) => { dispatch({ type: FETCH_FAIL, payload: err }); };
 
 const updateList = (dispatch, list) => {
   dispatch({ type: UPDATE_LISTS, payload: list });
 };
+
 
 const createTable = () => {
   const createDeck = 'create table if not exists deck (' +
@@ -70,22 +74,32 @@ const update = (dispatch) => {
   });
 };
 
-export const addDeck = cards => async (dispatch) => {
-  const deckID = uuidv4();
-  await db.transaction(
-    (tx) => {
-      tx.executeSql('insert into deck (deck_id, name, value) values (?, ?, ?);', [deckID, 'test', cards.length]);
-      cards.forEach((card) => {
-        tx.executeSql(
-          'insert into card (card_id, front, back, score, deck_id) values (?, ?, ?, ?, ?);',
-          [uuidv4(), card.value.front, card.value.back, 0, deckID],
-        );
-      });
-    },
-    (err) => { console.log(`failed to add item: ${err}`); },
-    // Refresh the deck list when finished adding new deck
-    () => update(dispatch),
-  );
+export const addDeck = url => async (dispatch) => {
+  try {
+    fetchStart(dispatch);
+    const response = await fetch(url);
+    const json = await response.json();
+    const deckID = await uuidv4();
+    await db.transaction(
+      (tx) => {
+        tx.executeSql('insert into deck (deck_id, name, value) values (?, ?, ?);', [deckID, json.name, json.cards.length]);
+        json.cards.forEach((card) => {
+          tx.executeSql(
+            'insert into card (card_id, front, back, score, deck_id) values (?, ?, ?, ?, ?);',
+            [uuidv4(), card.front, card.back, 0, deckID],
+          );
+        });
+      },
+      (err) => { fetchFail(dispatch, err); },
+      // Refresh the deck list when finished adding new deck
+      () => {
+        update(dispatch);
+        fetchSuccess(dispatch);
+      },
+    );
+  } catch (err) {
+    fetchFail(dispatch, err);
+  }
 };
 
 export const deleteDeck = deckID => async (dispatch) => {
@@ -94,7 +108,7 @@ export const deleteDeck = deckID => async (dispatch) => {
       tx.executeSql('delete from card where deck_id = ?;', [deckID]);
       tx.executeSql('delete from deck where deck_id = ?;', [deckID]);
     },
-    (err) => { console.log(err); },
+    (err) => { fetchFail(dispatch, err); },
     () => update(dispatch),
   );
 };
@@ -119,7 +133,7 @@ export const updateCards = deckID => async (dispatch) => {
       );
     },
     // create table when there is no table
-    (err) => { alert(err); },
+    (err) => { fetchFail(dispatch, err); },
     // Change the loading state when finished shuffling cards
     () => fetchSuccess(dispatch),
   );

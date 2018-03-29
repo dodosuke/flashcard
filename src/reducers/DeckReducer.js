@@ -16,6 +16,8 @@ export default (state = INITIAL_STATE, action) => {
       return { ...state, loading: true };
     case FETCH_SUCCESS:
       return { ...state, loading: false };
+    case FETCH_FAIL:
+      return { ...state, loading: false, err: action.payload };
     case UPDATE_LISTS:
       return { ...state, loading: false, list: action.payload };
     default:

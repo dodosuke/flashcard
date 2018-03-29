@@ -7,6 +7,7 @@ import thunk from 'redux-thunk';
 import reducers from './src/reducers';
 import ListScreen from './src/ListScreen';
 import DeckScreen from './src/DeckScreen';
+import EditScreen from './src/EditScreen';
 import SettingScreen from './src/SettingScreen';
 
 const styles = StyleSheet.create({
@@ -34,6 +35,7 @@ export default class App extends React.Component {
       main: StackNavigator({
         list: { screen: ListScreen },
         deck: { screen: DeckScreen },
+        edit: { screen: EditScreen }
       }),
       setting: StackNavigator({
         setting: { screen: SettingScreen },
