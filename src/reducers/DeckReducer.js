@@ -5,7 +5,7 @@ const INITIAL_STATE = {
   err: '',
   list: [],
   cards: [],
-  numOfCards: 20,
+  numOfCards: 10,
 };
 
 export default (state = INITIAL_STATE, action) => {

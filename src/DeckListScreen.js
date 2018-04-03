@@ -2,28 +2,20 @@ import React from 'react';
 import { FlatList } from 'react-native';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Button, ListItem } from 'react-native-elements';
+import { ListItem, Icon } from 'react-native-elements';
 import Swipeable from 'react-native-swipeable';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { updateCards, readList, deleteDeck } from './actions';
+import { pickCards, readList, deleteDeck } from './actions';
 import { Spinner, SwipeButton } from './components/common';
 
-class ListScreen extends React.Component {
-  static navigationOptions = ({ navigation }) => {
-    const params = navigation.state.params || {};
+class DeckListScreen extends React.Component {
+  static navigationOptions = () => {
     return {
       title: 'List',
-      headerRight: (
-        <Button
-          title="+"
-          color="rgba(0, 122, 255, 1)"
-          backgroundColor="transparent"
-        />
-      ),
       tabBarIcon: ({ focused, tintColor }) => {
         return (
           <Icon
             name="cards-outline"
+            type="material-community"
             color={focused ? tintColor : 'grey'}
             size={28}
           />
@@ -37,12 +29,13 @@ class ListScreen extends React.Component {
   }
 
   callDeck = (item) => {
-    this.props.updateCards(item.deck_id);
+    this.props.pickCards(item.deck_id, this.props.numOfCards);
     this.props.navigation.navigate('deck', { header: item.name, deckID: item.deck_id });
   }
 
   editName = (deckID) => {
-    console.log(deckID);
+    this.props.pickCards(deckID, null);
+    this.props.navigation.navigate('clist');
   }
 
   rightButtons = (deckID) => {
@@ -90,14 +83,17 @@ class ListScreen extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-  const { list, loading } = state.deck;
+  const { list, loading, numOfCards } = state.deck;
 
-  return { list, loading };
+  return { list, loading, numOfCards };
 };
 
-ListScreen.propTypes = {
-  updateCards: PropTypes.func.isRequired,
+DeckListScreen.propTypes = {
+  numOfCards: PropTypes.number,
+  pickCards: PropTypes.func.isRequired,
+  deleteDeck: PropTypes.func.isRequired,
+  readList: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
 };
 
-export default connect(mapStateToProps, { updateCards, readList, deleteDeck })(ListScreen);
+export default connect(mapStateToProps, { pickCards, readList, deleteDeck })(DeckListScreen);

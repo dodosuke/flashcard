@@ -122,14 +122,29 @@ export const updateScore = (card, memorized) => async () => {
   );
 };
 
-export const updateCards = deckID => async (dispatch) => {
+export const updateCard = (front, back, cardID) => async (dispatch) => {
+  await db.transaction(
+    (tx) => { tx.executeSql('update card set front = ?, back = ? where card_id = ?;', [front, back, cardID]); },
+    (err) => { fetchFail(dispatch, err); },
+  );
+};
+
+const updateCards = (dispatch, cards, numOfCards) => {
+  dispatch({
+    type: UPDATE_CARDS,
+    payload: (numOfCards === null) ? cards : _.sampleSize(cards, numOfCards),
+  });
+};
+
+export const pickCards = (deckID, numOfCards) => async (dispatch) => {
   fetchStart(dispatch);
+  const limit = (numOfCards === null) ? 5 : 3;
   db.transaction(
     (tx) => {
       tx.executeSql(
-        'select * from card where deck_id = ?',
-        [deckID],
-        (t, { rows }) => dispatch({ type: UPDATE_CARDS, payload: _.sampleSize(rows._array, 10) }),
+        'select * from card where deck_id = ? and score < ?',
+        [deckID, limit],
+        (t, { rows }) => updateCards(dispatch, rows._array, numOfCards),
       );
     },
     // create table when there is no table

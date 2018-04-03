@@ -1,8 +1,9 @@
 import React from 'react';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
-import { ListItem } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/SimpleLineIcons';
+import PropTypes from 'prop-types';
+import { Icon } from 'react-native-elements';
+import { Form, Picker, Item } from 'native-base';
 import { addDeck, dropTables } from './actions';
 
 class SettingScreen extends React.Component {
@@ -12,6 +13,7 @@ class SettingScreen extends React.Component {
       return (
         <Icon
           name="settings"
+          type="simple-line-icon"
           color={focused ? tintColor : 'grey'}
           size={25}
         />
@@ -19,15 +21,47 @@ class SettingScreen extends React.Component {
     },
   }
 
+  constructor(props) {
+    super(props);
+
+    this.state = { numOfCards: props.numOfCards };
+  }
+
+  onValueChange(value) {
+    this.setState({ numOfCards: value });
+  }
+
   render() {
     return (
       <View>
-        <ListItem title="Number of Cards" />
+        <Form>
+          <Picker
+            mode="dropdown"
+            placeholder="Number of Cards"
+            selectedValue={this.state.numOfCards}
+            onValueChange={value => this.onValueChange(value)}
+          >
+            <Item label="Number of Cards: 10" value={10} />
+            <Item label="Number of Cards: 20" value={20} />
+            <Item label="Number of Cards: 30" value={30} />
+          </Picker>
+        </Form>
         {/* <ListItem title="Drop Tables" onPress={() => this.props.dropTables()} /> */}
-        <ListItem title="Add data" onPress={() => this.props.addDeck('https://mighty-cliffs-26134.herokuapp.com/json')} />
+        {/* <ListItem title="Add data" onPress={() => this.props.addDeck('https://mighty-cliffs-26134.herokuapp.com/json')} /> */}
       </View>
     );
   }
 }
 
-export default connect(null, { dropTables, addDeck })(SettingScreen);
+const mapStateToProps = (state) => {
+  const { numOfCards } = state.deck;
+
+  return { numOfCards };
+};
+
+SettingScreen.propTypes = {
+  numOfCards: PropTypes.number.isRequired,
+  addDeck: PropTypes.func.isRequired,
+};
+
+export default connect(mapStateToProps, { dropTables, addDeck })(SettingScreen);

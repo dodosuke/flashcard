@@ -1,12 +1,11 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { connect } from 'react-redux';
-import { Card, Button } from 'react-native-elements';
+import { Card, Button, Icon } from 'react-native-elements';
 import PropTypes from 'prop-types';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Deck from './components/Deck';
 import { Spinner } from './components/common';
-import { updateCards, updateScore } from './actions';
+import { pickCards, updateScore } from './actions';
 
 class DeckScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -14,17 +13,11 @@ class DeckScreen extends React.Component {
     return {
       title: 'List',
       headerTitle: params ? params.header : '',
-      headerRight: (
-        <Button
-          title="Edit"
-          color="rgba(0, 122, 255, 1)"
-          backgroundColor="transparent"
-        />
-      ),
       tabBarIcon: ({ focused, tintColor }) => {
         return (
           <Icon
             name="cards-outline"
+            type="material-community"
             color={focused ? tintColor : 'grey'}
             size={28}
           />
@@ -48,15 +41,25 @@ class DeckScreen extends React.Component {
   renderCard = (card) => {
     return (
       <Card title={card.front} titleStyle={{ textAlign: 'left' }}>
-        <Text style={{ marginBottom: 10, textAlign: 'left', opacity: this.state.back, color: 'red' }}>
+        <Text style={{ opacity: this.state.back, marginBottom: 10, textAlign: 'left', color: 'red' }}>
           {card.back}
         </Text>
-        <Button
-          icon={{ name: 'replay' }}
-          backgroundColor="#03A9F4"
-          title="Check the Answer"
-          onPress={() => this.setState({ back: 1 })}
-        />
+        <View style={{ flexDirection: 'row' }}>
+          <Button
+            icon={{ name: 'replay' }}
+            backgroundColor="#03A9F4"
+            title="Check the Answer"
+            containerViewStyle={{ flex: 1 }}
+            onPress={() => this.setState({ back: 1 })}
+          />
+          <Icon
+            name="pencil"
+            type="material-community"
+            color="grey"
+            borderRadius={20}
+            onPress={() => this.props.navigation.navigate('edit', { card })}
+          />
+        </View>
       </Card>
     );
   }
@@ -69,7 +72,7 @@ class DeckScreen extends React.Component {
         <Button
           backgroundColor="#03A9F4"
           title="Get more!"
-          onPress={() => this.props.updateCards(deckID)}
+          onPress={() => this.props.pickCards(deckID, this.props.numOfCards)}
         />
       </Card>
     );
@@ -89,14 +92,15 @@ class DeckScreen extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-  const { cards, loading } = state.deck;
-  return { cards, loading };
+  const { cards, loading, numOfCards } = state.deck;
+  return { cards, loading, numOfCards };
 };
 
 DeckScreen.propTypes = {
   updateScore: PropTypes.func.isRequired,
-  updateCards: PropTypes.func.isRequired,
+  pickCards: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
+  numOfCards: PropTypes.number.isRequired,
   cards: PropTypes.arrayOf(PropTypes.shape({
     card_id: PropTypes.string.isRequired,
     front: PropTypes.string,
@@ -106,4 +110,4 @@ DeckScreen.propTypes = {
   })).isRequired,
 };
 
-export default connect(mapStateToProps, { updateCards, updateScore })(DeckScreen);
+export default connect(mapStateToProps, { pickCards, updateScore })(DeckScreen);

@@ -42,4 +42,6 @@ const Input = ({ placeholder, label, value, onChangeText, secureTextEntry }) => 
   );
 };
 
+
+
 export { Input };

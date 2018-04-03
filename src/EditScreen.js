@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Text, View } from 'react-native';
 import { connect } from 'react-redux';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Button, Icon } from 'react-native-elements';
 import PropTypes from 'prop-types';
-import { frontChanged, backChanged, updateCard } from './actions';
-import { Card, CardSection, Button, Input, Spinner } from './components/common';
+import { Card, CardSection, Input, Spinner } from './components/common';
+import { updateCard } from './actions/DeckActions';
 
 const styles = {
   errorTextStyle: {
@@ -15,13 +15,14 @@ const styles = {
 };
 
 class EditScreen extends Component {
-  static navigationOptions = ({ navigation }) => {
+  static navigationOptions = () => {
     return {
       title: 'List',
       tabBarIcon: ({ focused, tintColor }) => {
         return (
           <Icon
             name="cards-outline"
+            type="material-community"
             color={focused ? tintColor : 'grey'}
             size={28}
           />
@@ -30,10 +31,22 @@ class EditScreen extends Component {
     };
   }
 
-  onButtonPress() {
-    const { front, back } = this.props;
+  constructor(props) {
+    super(props);
 
-    console.log(front, back);
+    const card = props.navigation.getParam('card');
+
+    this.state = {
+      front: card.front,
+      back: card.back,
+      cardID: card.card_id,
+    };
+  }
+
+  onButtonPress() {
+    const { front, back, cardID } = this.state;
+
+    this.props.updateCard(front, back, cardID);
   }
 
   renderError() {
@@ -50,33 +63,35 @@ class EditScreen extends Component {
   }
 
   renderButton() {
-    if (this.props.loading) {
-      return <Spinner size="large" />;
-    }
-    return (<Button onPress={() => this.onButtonPress()}>Login</Button>);
+    if (this.props.loading) { return <Spinner size="large" />; }
+
+    return (
+      <Button
+        title="UPDATE"
+        containerViewStyle={{ flex: 1 }}
+        onPress={() => this.onButtonPress()}
+      />
+    );
   }
 
   render() {
-    const { card } = this.props;
-
     return (
       <Card>
         <CardSection>
           <Input
-            label="Front"
+            label="front"
             placeholder=""
-            onChangeText={(text) => { this.props.frontChanged(text); }}
-            value={this.props.front}
+            onChangeText={(front) => { this.setState({ front }); }}
+            value={this.state.front}
           />
         </CardSection>
 
         <CardSection>
           <Input
-            secureTextEntry
-            label="Back"
+            label="back"
             placeholder=""
-            onChangeText={(text) => { this.props.backChanged(text); }}
-            value={this.props.back}
+            onChangeText={(back) => { this.setState({ back }); }}
+            value={this.state.back}
           />
         </CardSection>
 
@@ -90,15 +105,16 @@ class EditScreen extends Component {
   }
 }
 
-const mapStateToProps = ({ edit }) => {
-  const { front, back, err } = edit;
+const mapStateToProps = (state) => {
+  const { err, loading } = state.deck;
 
-  return { front, back, err };
+  return { err, loading };
 };
 
 EditScreen.propTypes = {
+  updateCard: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
   err: PropTypes.string.isRequired,
 };
 
-export default connect(mapStateToProps, { frontChanged, backChanged, updateCard })(EditScreen);
+export default connect(mapStateToProps, { updateCard })(EditScreen);
