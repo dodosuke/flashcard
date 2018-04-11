@@ -113,6 +113,7 @@ export const deleteDeck = deckID => async (dispatch) => {
   );
 };
 
+// this function will be deprecated.
 export const updateScore = (card, memorized) => async () => {
   // +1 if memorized; -2 if forgot
   const newScore = (memorized) ? card.score + 1 : card.score - 2;
@@ -122,9 +123,18 @@ export const updateScore = (card, memorized) => async () => {
   );
 };
 
-export const updateCard = (front, back, cardID) => async (dispatch) => {
+export const insertCard = (front, back, score, deckID) => async (dispatch) => {
+  const cardID = await uuidv4();
   await db.transaction(
-    (tx) => { tx.executeSql('update card set front = ?, back = ? where card_id = ?;', [front, back, cardID]); },
+    (tx) => { tx.executeSql('insert into card (card_id, front, back, score ,deck_id) values (?, ?, ?, ?, ?);', [cardID, front, back, score, deckID]); },
+    (err) => { fetchFail(dispatch, err); },
+    () => console.log('success!'),
+  );
+};
+
+export const updateCard = (front, back, score, cardID) => async (dispatch) => {
+  await db.transaction(
+    (tx) => { tx.executeSql('update card set front = ?, back = ?, score = ? where card_id = ?;', [front, back, score, cardID]); },
     (err) => { fetchFail(dispatch, err); },
   );
 };

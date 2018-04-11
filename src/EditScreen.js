@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Text, View } from 'react-native';
 import { connect } from 'react-redux';
-import { Button, Icon } from 'react-native-elements';
+import { Button, Icon, ButtonGroup } from 'react-native-elements';
 import PropTypes from 'prop-types';
 import { Card, CardSection, Input, Spinner } from './components/common';
-import { updateCard } from './actions/DeckActions';
+import { updateCard, insertCard, pickCards } from './actions/DeckActions';
 
 const styles = {
   errorTextStyle: {
@@ -40,13 +40,26 @@ class EditScreen extends Component {
       front: card.front,
       back: card.back,
       cardID: card.card_id,
+      score: card.score,
+      deckID: card.deck_id,
     };
   }
 
   onButtonPress() {
-    const { front, back, cardID } = this.state;
+    const {
+      front,
+      back,
+      cardID,
+      score,
+      deckID,
+    } = this.state;
 
-    this.props.updateCard(front, back, cardID);
+    if (cardID === null) {
+      this.props.insertCard(front, back, score, deckID);
+      this.props.pickCards(deckID, null);
+    } else {
+      this.props.updateCard(front, back, score, cardID);
+    }
   }
 
   renderError() {
@@ -67,7 +80,7 @@ class EditScreen extends Component {
 
     return (
       <Button
-        title="UPDATE"
+        title={(this.state.cardID === null) ? 'ADD' : 'UPDATE'}
         containerViewStyle={{ flex: 1 }}
         onPress={() => this.onButtonPress()}
       />
@@ -77,10 +90,14 @@ class EditScreen extends Component {
   render() {
     return (
       <Card>
+        <ButtonGroup
+          selectedIndex={0}
+          buttons={['front', 'back']}
+          containerStyle={{ height: 30 }}
+        />
         <CardSection>
           <Input
             label="front"
-            placeholder=""
             onChangeText={(front) => { this.setState({ front }); }}
             value={this.state.front}
           />
@@ -89,7 +106,6 @@ class EditScreen extends Component {
         <CardSection>
           <Input
             label="back"
-            placeholder=""
             onChangeText={(back) => { this.setState({ back }); }}
             value={this.state.back}
           />
@@ -112,9 +128,11 @@ const mapStateToProps = (state) => {
 };
 
 EditScreen.propTypes = {
+  insertCard: PropTypes.func.isRequired,
+  pickCards: PropTypes.func.isRequired,
   updateCard: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
   err: PropTypes.string.isRequired,
 };
 
-export default connect(mapStateToProps, { updateCard })(EditScreen);
+export default connect(mapStateToProps, { updateCard, insertCard, pickCards })(EditScreen);

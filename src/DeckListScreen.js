@@ -35,7 +35,7 @@ class DeckListScreen extends React.Component {
 
   editName = (deckID) => {
     this.props.pickCards(deckID, null);
-    this.props.navigation.navigate('clist');
+    this.props.navigation.navigate('clist', { deckID });
   }
 
   rightButtons = (deckID) => {

@@ -2,9 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Icon } from 'react-native-elements';
-import { Form, Picker, Item } from 'native-base';
-import { addDeck, dropTables } from './actions';
+import { List, Icon, ButtonGroup, ListItem } from 'react-native-elements';
 
 class SettingScreen extends React.Component {
   static navigationOptions = {
@@ -24,31 +22,22 @@ class SettingScreen extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { numOfCards: props.numOfCards };
+    this.state = { selectedIndex: 0 };
   }
 
-  onValueChange(value) {
-    this.setState({ numOfCards: value });
+  updateIndex(selectedIndex) {
+    this.setState({ selectedIndex });
   }
 
   render() {
+    const buttons = ['10', '20', '30'];
+
     return (
-      <View>
-        <Form>
-          <Picker
-            mode="dropdown"
-            placeholder="Number of Cards"
-            selectedValue={this.state.numOfCards}
-            onValueChange={value => this.onValueChange(value)}
-          >
-            <Item label="Number of Cards: 10" value={10} />
-            <Item label="Number of Cards: 20" value={20} />
-            <Item label="Number of Cards: 30" value={30} />
-          </Picker>
-        </Form>
-        {/* <ListItem title="Drop Tables" onPress={() => this.props.dropTables()} /> */}
-        {/* <ListItem title="Add data" onPress={() => this.props.addDeck('https://mighty-cliffs-26134.herokuapp.com/json')} /> */}
-      </View>
+      <List>
+        <ListItem
+          title="Number of Cards"
+        />
+      </List>
     );
   }
 }
@@ -61,7 +50,6 @@ const mapStateToProps = (state) => {
 
 SettingScreen.propTypes = {
   numOfCards: PropTypes.number.isRequired,
-  addDeck: PropTypes.func.isRequired,
 };
 
-export default connect(mapStateToProps, { dropTables, addDeck })(SettingScreen);
+export default connect(mapStateToProps, null)(SettingScreen);

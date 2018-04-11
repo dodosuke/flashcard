@@ -2,13 +2,29 @@ import React from 'react';
 import { FlatList } from 'react-native';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { ListItem, Icon } from 'react-native-elements';
+import { Icon, CheckBox, Button } from 'react-native-elements';
 import { Spinner } from './components/common';
+import { updateCard, pickCards } from './actions/DeckActions';
 
 class CardListScreen extends React.Component {
-  static navigationOptions = () => {
+  static navigationOptions = ({ navigation }) => {
+    const card = {
+      front: '',
+      back: '',
+      score: 0,
+      card_id: null,
+      deck_id: navigation.getParam('deckID'),
+    };
     return {
       title: 'List',
+      headerRight: (
+        <Button
+          title="Add"
+          color="rgba(0, 122, 255, 1)"
+          backgroundColor="transparent"
+          onPress={() => navigation.navigate('edit', { card })}
+        />
+      ),
       tabBarIcon: ({ focused, tintColor }) => {
         return (
           <Icon
@@ -22,6 +38,23 @@ class CardListScreen extends React.Component {
     };
   }
 
+  onIconPress = (card) => {
+    const {
+      front,
+      back,
+      score,
+      card_id,
+    } = card;
+    const deckID = this.props.navigation.getParam('deckID');
+
+    if (score < 3) {
+      this.props.updateCard(front, back, 3, card_id);
+    } else {
+      this.props.updateCard(front, back, 0, card_id);
+    }
+    this.props.pickCards(deckID, null);
+  }
+
   renderList = () => {
     if (this.props.loading) { return <Spinner />; }
     return (
@@ -29,9 +62,11 @@ class CardListScreen extends React.Component {
         data={this.props.cards}
         keyExtractor={item => item.card_id}
         renderItem={({ item }) => (
-          <ListItem
+          <CheckBox
             title={item.front}
-            subtitle={item.score}
+            checked={(item.score < 3)}
+            onIconPress={() => this.onIconPress(item)}
+            onPress={() => this.props.navigation.navigate('edit', { card: item })}
           />
         )}
       />
@@ -52,6 +87,8 @@ const mapStateToProps = (state) => {
 };
 
 CardListScreen.propTypes = {
+  updateCard: PropTypes.func.isRequired,
+  pickCards: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
   cards: PropTypes.arrayOf(PropTypes.shape({
     card_id: PropTypes.string.isRequired,
@@ -62,4 +99,4 @@ CardListScreen.propTypes = {
   })).isRequired,
 };
 
-export default connect(mapStateToProps, null)(CardListScreen);
+export default connect(mapStateToProps, { updateCard, pickCards })(CardListScreen);
