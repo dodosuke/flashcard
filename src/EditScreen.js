@@ -57,6 +57,7 @@ class EditScreen extends Component {
     if (cardID === null) {
       this.props.insertCard(front, back, score, deckID);
       this.props.pickCards(deckID, null);
+      this.props.navigation.navigate('clist', { deckID });
     } else {
       this.props.updateCard(front, back, score, cardID);
     }
